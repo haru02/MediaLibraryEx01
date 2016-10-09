@@ -7,70 +7,63 @@ import android.database.Cursor;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ListFragment.OnFragmentInteractionListener{
 
     private final static int REQUEST_CODE = 100;
+    public static ArrayList<MusicData> datas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        datas = getMusicInfo();
+        Log.i("MusicData", "-----------------뮤직데이터 입력 완료");
         setContentView(R.layout.activity_main);
-        // 안드로이드 버전이 마시멜로우 미만일 경우 데이터를 그냥 세팅
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-            initData();
+
+        // 권한 세팅
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            datas = getMusicInfo();
+            ListFragment lf = new ListFragment();}
         else
-            checkPermissions(); // 마시멜로우 이상일 경우는 런타임 권한을 체크해야 한다
+            checkPermissions();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkPermissions() {
-        // 런타임 권한 체크 (디스크읽기권한)
         if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ){
-            // 요청할 권한 배열생성
             String permissionArray[] = { Manifest.permission.READ_EXTERNAL_STORAGE };
-            // 런타임 권한요청을 위한 팝업창 출력
             requestPermissions( permissionArray , REQUEST_CODE );
         }else{
-            // 런타임 권한이 이미 있으면 데이터를 세팅한다
-            initData();
+            ListFragment lf = new ListFragment();
         }
     }
 
-    // 권한 체크 팝업창 처리후 호출되는 콜백함수
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode) {
-            case REQUEST_CODE: // 요청코드가 위의 팝업창에 넘겨준 코드와 같으면
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { // 권한을 체크하고
-                    // 권한이 있으면 데이터를 생성한다
-                    initData();
+            case REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    datas = getMusicInfo();
+                    ListFragment lf = new ListFragment();
                 }
                 break;
         }
     }
 
-    public void initData(){
-        ArrayList<MusicData> datas = getMusicInfo();
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerCardView);
-        RecyclerCardAdapter adapter = new RecyclerCardAdapter(datas, R.layout.card_item, this);
-        recyclerView.setAdapter(adapter);
-
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(manager);
-    }
-
     public ArrayList<MusicData> getMusicInfo(){
         ArrayList<MusicData> datas = new ArrayList<>();
 
-        // 미디어 스토어에서 가져올 컬럼명 세팅
         String projections[] = {
                 MediaStore.Audio.Media._ID,       // 노래아이디
                 MediaStore.Audio.Media.ALBUM_ID,  // 앨범아이디
@@ -111,5 +104,16 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
         return datas;
+    }
+
+    @Override
+    public void onFragmentInteraction(int position) {
+        Log.i("MusicData", "----------------mainactivity도착");
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction tr = fm.beginTransaction();
+        PagerFragment pf = new PagerFragment();
+        tr.replace(R.id.fragment2, pf);
+        tr.commit();
+        pf.updateInfo(position);
     }
 }

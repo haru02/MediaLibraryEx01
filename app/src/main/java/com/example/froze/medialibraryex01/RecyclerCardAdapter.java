@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +30,15 @@ public class RecyclerCardAdapter extends RecyclerView.Adapter<RecyclerCardAdapte
     ArrayList<MusicData> datas;
     int itemLayout;
     Context context;
+    static RecyclerViewClickListener itemListener;
 
-    public RecyclerCardAdapter(ArrayList<MusicData> datas, int itemLayout, Context context){
+
+    public RecyclerCardAdapter(ArrayList<MusicData> datas, int itemLayout, Context context, RecyclerViewClickListener itemListener){
         this.datas = datas;
         this.itemLayout = itemLayout;
         this.context = context;
+        this.itemListener = itemListener;
+
     }
 
     // view 를 만들어서 홀더에 저장하는 역할
@@ -50,7 +55,7 @@ public class RecyclerCardAdapter extends RecyclerView.Adapter<RecyclerCardAdapte
         //holder.img.setImageResource(data.image);
         holder.img.setImageBitmap(getAlbumArtImage(context, Integer.parseInt(data.albumId)));
         holder.textTitle.setText(data.title);
-        holder.textArtist.setText(data.artist);
+       //holder.textArtist.setText(data.artist);
         holder.itemView.setTag(data);
 
 
@@ -114,19 +119,33 @@ public class RecyclerCardAdapter extends RecyclerView.Adapter<RecyclerCardAdapte
         return datas.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView img;
         TextView textTitle;
         TextView textArtist;
+        int dataposition;
         CardView cardView;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             img = (ImageView) itemView.findViewById(R.id.albumimage);
             textTitle = (TextView) itemView.findViewById(R.id.albumtitle);
-            textArtist = (TextView) itemView.findViewById(R.id.artistname);
+           // textArtist = (TextView) itemView.findViewById(R.id.artistname);
             cardView = (CardView) itemView.findViewById(R.id.carditem);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            Log.i("MusicData", "-----------------------Adapter 도착"+this.getAdapterPosition());
+            itemListener.recyclerViewListClicked(v, this.getAdapterPosition());
+        }
+    }
+
+    public interface RecyclerViewClickListener
+    {
+        public void recyclerViewListClicked(View v, int position);
     }
 }

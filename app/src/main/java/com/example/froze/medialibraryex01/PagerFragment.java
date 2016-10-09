@@ -4,24 +4,25 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import static com.example.froze.medialibraryex01.MainActivity.datas;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ListFragment.OnFragmentInteractionListener} interface
+ * {@link PagerFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ListFragment#newInstance} factory method to
+ * Use the {@link PagerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListFragment extends Fragment implements RecyclerCardAdapter.RecyclerViewClickListener{
+public class PagerFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -33,9 +34,10 @@ public class ListFragment extends Fragment implements RecyclerCardAdapter.Recycl
 
     private OnFragmentInteractionListener mListener;
     View view;
+    int dataposition=-1;
+    Context context;
 
-
-    public ListFragment() {
+    public PagerFragment() {
         // Required empty public constructor
     }
 
@@ -45,11 +47,11 @@ public class ListFragment extends Fragment implements RecyclerCardAdapter.Recycl
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ListFragment.
+     * @return A new instance of fragment PagerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ListFragment newInstance(String param1, String param2) {
-        ListFragment fragment = new ListFragment();
+    public static PagerFragment newInstance(String param1, String param2) {
+        PagerFragment fragment = new PagerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -69,40 +71,41 @@ public class ListFragment extends Fragment implements RecyclerCardAdapter.Recycl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_list, container, false);
+        view = inflater.inflate(R.layout.fragment_pager, container, false);
+        ImageView bigimage = (ImageView)view.findViewById(R.id.bigimage);
+        TextView title = (TextView)view.findViewById(R.id.fragment2_textView);
+        TextView artist = (TextView)view.findViewById(R.id.fragment2_textView2);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerCardView);
-        RecyclerCardAdapter adapter = new RecyclerCardAdapter(MainActivity.datas, R.layout.card_item, getActivity(), this);
-        recyclerView.setAdapter(adapter);
-
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(manager);
-
-        Log.i("MusicData", "--------------------------fragment전개 완료");
-
-
-      /*  recyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int dataposition = (int)view.getTag();
-                mListener.onFragmentInteraction(dataposition);
-
-                Log.i("MusicData", "--------------------------클릭 완료"+dataposition);
-            }
-        });*/
+        if(dataposition==-1){
+            title.setText("클릭하세요");
+            artist.setVisibility(View.GONE);
+        }else {
+            artist.setVisibility(View.VISIBLE);
+            Log.i("MusicData", "----------------PagerFragment else"+ dataposition);
+            MusicData data = datas.get(dataposition);
+            bigimage.setImageBitmap(RecyclerCardAdapter.getAlbumArtImage(getActivity(), Integer.parseInt(data.albumId)));
+            title.setText(dataposition + ". " + data.title);
+            artist.setText(data.artist);
+        }
 
         return view;
     }
 
+    public void updateInfo(int position){
+        dataposition=position;
+        Log.i("MusicData", "----------------PagerFragment도착"+position);
+    }
 
-/*
-    // TODO: Rename method, update argument and hook method into UI event
+
+
+
+/*    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
-    */
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -114,14 +117,11 @@ public class ListFragment extends Fragment implements RecyclerCardAdapter.Recycl
         }
     }
 
-
-/*
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-*/
+    }*/
 
     /**
      * This interface must be implemented by activities that contain this
@@ -134,14 +134,7 @@ public class ListFragment extends Fragment implements RecyclerCardAdapter.Recycl
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-
-        void onFragmentInteraction(int position);
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
-
-    @Override
-    public void recyclerViewListClicked(View v, int position) {
-        Log.i("MusicData", "---------------ListFragment도착"+position);
-        mListener.onFragmentInteraction(position);
-    }
-
 }

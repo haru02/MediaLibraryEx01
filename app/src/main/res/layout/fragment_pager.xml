@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.froze.medialibraryex01.PagerFragment"
+    android:background="#454545">
+
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:layout_marginTop="50dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:id="@+id/bigimage"
+    android:elevation="10dp"
+    />
+    <TextView
+        android:text="Fragment2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment2_textView"
+        android:layout_below="@+id/bigimage"
+        android:textSize="15dp"
+        android:layout_marginLeft="20dp"
+        android:textColor="#ffffff"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment2_textView2"
+        android:layout_below="@+id/fragment2_textView"
+        android:textSize="15dp"
+        android:layout_marginLeft="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColor="#ffffaa"/>
+</RelativeLayout>
